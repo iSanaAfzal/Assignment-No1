@@ -1,99 +1,163 @@
-// Scenario 1 - Buying Groceries
 
-function buyGroceries(choice: string): number {
-  let totalBill = 0;
+import inquirer from 'inquirer';
 
-  if (choice === 'fruits') {
-      console.log('Available fruits: Apple, Banana, Orange');
-      const fruitChoice = 'Apple'; // Assume the user chooses Apple
-      const fruitPrice = 2.5;
-      totalBill += fruitPrice;
-      console.log(`Added ${fruitChoice} to your cart. Price: $${fruitPrice}`);
-  } else if (choice === 'vegetables') {
-      console.log('Available vegetables: Carrot, Broccoli, Spinach');
-      const vegChoice = 'Carrot'; // Assume the user chooses Carrot
-      const vegPrice = 1.5;
-      totalBill += vegPrice;
-      console.log(`Added ${vegChoice} to your cart. Price: $${vegPrice}`);
-  } else {
-      console.log('Invalid choice. Please choose fruits or vegetables.');
-  }
+const fruits: { name: string; price: number }[] = [
+  { name: 'Apple', price: 2 },
+  { name: 'Banana', price: 1 },
+  { name: 'Orange', price: 3 },
+];
 
-  return totalBill;
-}
+const vegetables: { name: string; price: number }[] = [
+  { name: 'Tomato', price: 1 },
+  { name: 'Carrot', price: 2 },
+  { name: 'Potato', price: 0.5 },
+];
 
-// Scenario 2 - Checking Discounts
-function applyDiscount(totalBill: number): number {
-  let discountedTotal = totalBill;
+const groceries: { name: string; price: number }[] = [
+  { name: 'Milk', price: 3 },
+  { name: 'Bread', price: 2 },
+  { name: 'Eggs', price: 4 },
+];
 
-  if (totalBill > 10) {
-      const discountPercentage = 0.1; // 10% discount for bills above $10
-      discountedTotal = totalBill - totalBill * discountPercentage;
-      console.log(`You get a 10% discount! New total: $${discountedTotal}`);
-  }
+let cart: { name: string; price: number }[] = [];
+let totalBill = 0;
 
-  return discountedTotal;
-}
-
-// Scenario 3 - Checkout Process
-function checkoutProcess(paymentMethod: string): void {
-  const paymentOptions = ['Credit Card', 'Debit Card', 'Cash'];
-  let isValidPayment = false;
-
-  for (let i = 0; i < paymentOptions.length; i++) {
-      console.log(`[${i + 1}] ${paymentOptions[i]}`);
-  }
-
-  while (!isValidPayment) {
-      const selectedOption = 2; // Assume the user chooses Debit Card
-      if (selectedOption >= 1 && selectedOption <= paymentOptions.length) {
-          console.log(`You have chosen ${paymentOptions[selectedOption - 1]} for payment. Thank you!`);
-          isValidPayment = true;
+function startShopping() {
+  inquirer
+    .prompt([
+      {
+        type: 'list',
+        name: 'department',
+        message: 'What department would you like to visit?',
+        choices: ['Fruits', 'Vegetables', 'Groceries'],
+      },
+    ])
+    .then((answers) => {
+      if (answers.department === 'Fruits') {
+       
+        buyFruits();
+        
+      } else if (answers.department === 'Vegetables') {
+       
+        buyVegetables();
       } else {
-          console.log('Invalid option. Please choose a valid payment method.');
+        buyGroceries();
+       
       }
-  }
+    });
 }
 
-// Main shopping simulation
-const groceryChoice = 'fruits'; // Assume the user wants to buy fruits
-const totalBill = buyGroceries(groceryChoice);
-const discountedTotal = applyDiscount(totalBill);
-checkoutProcess('Debit Card'); // Assume the user chooses Debit Card for payment
- 
-/*Explaination:
-This code simulates the process of buying groceries, applying discounts, and checking out. Here's a breakdown of each step:
+function buyFruits() {
+  inquirer
+    .prompt([
+      {
+        type: 'checkbox',
+        name: 'fruits',
+        message: 'Select the fruits you want to buy:',
+        choices: fruits.map((fruit) => fruit.name),
+      },
+    ])
+    .then((answers) => {
+      for (const fruit of fruits) {
+        if (answers.fruits.includes(fruit.name)) {
+          cart.push(fruit);
+          totalBill += fruit.price;
+        }
+      }
+      checkDiscounts();
+    });
+}
 
-Scenario 1: Buying Groceries:
+function buyVegetables() {
+    inquirer
+    .prompt([
+      {
+        type: 'checkbox',
+        name: 'vegetables',
+        message: 'Select the vegetables you want to buy:',
+        choices: vegetables.map((vegetables) =>vegetables.name),
+      },
+    ])
+    .then((answers) => {
+      for (const vegetable of vegetables) {
+        if (answers.vegetables.includes(vegetable.name)) {
+          cart.push(vegetable);
+          totalBill += vegetable.price;
+        }
+      }
+      checkDiscounts();
+    });
+}
 
-buyGroceries function: This function takes a string representing the user's choice ("fruits" or "vegetables") and returns the total bill amount.
-Choice Validation:
-If the choice is "fruits", the function displays available fruits and assumes the user chooses "Apple" with a price of $2.5.
-If the choice is "vegetables", the function displays available vegetables and assumes the user chooses "Carrot" with a price of $1.5.
-If the choice is invalid, the function prompts the user to choose again.
-Bill Update:
-The chosen item's price is added to the totalBill variable.
-Confirmation Message:
-A message confirms the chosen item and its price.
-Scenario 2: Checking Discounts:
+function buyGroceries() {
+    inquirer
+    .prompt([
+      {
+        type: 'checkbox',
+        name: 'Groceries',
+        message: 'Select the Groceries you want to buy:',
+        choices: groceries.map((groceries) => groceries.name),
+      },
+    ])
+    .then((answers) => {
+      for (const grocery of groceries) {
+        if (answers.groceries.includes(grocery.name)) {
+          cart.push(grocery);
+          totalBill += grocery.price;
+        }
+      }
+      checkDiscounts();
+    });
+}
 
-applyDiscount function: This function takes the totalBill and applies a discount if applicable.
-Discount Calculation:
-If the totalBill is greater than $10, a 10% discount is applied.
-New Total Calculation:
-The discounted total is calculated and stored in the discountedTotal variable.
-Discount Announcement:
-If a discount is applied, a message informs the user about the new discounted total.
-Scenario 3: Checkout Process:
+function checkDiscounts() {
+  if (totalBill > 10) {
+    totalBill *= 0.9; // 10% discount
+  }
+  inquirer
+    .prompt([
+      {
+        type: 'list',
+        name: 'paymentMethod',
+        message: 'How would you like to pay?',
+        choices: ['Cash', 'Credit Card', 'Debit Card'],
+      },
+    ])
+    .then((answers) => {
+      console.log('Your total bill is:', totalBill.toFixed(2));
+      console.log(`Payment method: ${answers.paymentMethod}`);
+    });
+}
 
-checkoutProcess function: This function takes the user's chosen payment method as a string.
-Payment Options:
-An array of available payment methods ("Credit Card", "Debit Card", "Cash") is defined.
-Each option is displayed with a numbered index.
-Validating Payment:
-The function enters a loop that continues until a valid payment option is chosen.
-User Choice:
-The code assumes the user chooses "Debit Card" which has an index of 2 (selectedOption = 2).
-Confirmation and Exit:
-If the chosen option is within the valid range, the function confirms the selected payment method and ends the program.
-If the chosen option is invalid, the function prompts the user to choose again.*/
+
+startShopping();
+/*Step 1: Choose a department
+
+The program prompts the user to choose a department: Fruits, Vegetables, or Groceries.
+Let's say the user chooses Fruits.
+Step 2: Select fruits
+
+The program displays a list of available fruits with their prices.
+The user can select multiple fruits using checkboxes.
+Let's say the user selects Apple and Orange.
+Step 3: Add fruits to cart and update bill
+
+The program adds the chosen fruits (Apple and Orange) to the cart array.
+It also updates the totalBill by adding the prices of the chosen fruits.
+Step 4: Check for discounts
+
+The program checks if the totalBill is greater than a certain amount (e.g., 10).
+If it is, the program applies a discount (e.g., 10%) to the totalBill.
+In this case, let's assume the totalBill is below the threshold, so no discount is applied.
+Step 5: Choose payment method
+
+The program prompts the user to choose a payment method: Cash, Credit Card, or Debit Card.
+Let's say the user chooses Cash.
+Step 6: Display final bill and payment details
+
+The program displays the final bill amount, which is the sum of the prices of all chosen items.
+It also displays the chosen payment method.*/
+
+
+
+     
